@@ -1,0 +1,29 @@
+# For dev.
+local-machine
+settings.*.json
+
+# Common dev note files.
+todo*.txt
+note*.txt
+
+# Secrets
+*-secret.*
+*.secret.*
+
+# Build directories.
+node_modules
+dist
+
+# TS
+**/test**/*.js
+**/test**/*.js.map
+**/ts-build
+
+# NPM logs.
+npm-debug.log
+
+# Output of 'npm pack'
+*.tgz
+
+# OS X temporary files
+.DS_Store
