@@ -9,7 +9,7 @@ View on [npm](https://www.npmjs.com/package/@messman/node-mono-builder) or on [G
 
 ## What?
 
-This tool exposes a CLI to:
+This package exposes a library to:
 - Run commands from the `package.json scripts` of local projects in dependency order
 - Publish local projects to an internal repository like [Verdaccio](https://github.com/verdaccio/verdaccio) running on your machine or in Docker and pull in those published projects to consuming local projects with a single command (instead of using symlinks)
 
@@ -92,23 +92,17 @@ This tool relies on the availability of `npm` and a tool like `verdaccio` to sup
 
 This tool does not actually build projects - it simply provides a top-level management interface for calling commands that will build them. Thus, in each of your projects, you may need to install dependencies like `webpack` or `TypeScript`. This tool does not cause `npm` to install packages in weird common shared locations - thus, you can easily switch between using the tool and manually using the commands defined in each project's `package.json`.
 
-## CLI
+## API
 
-Once you have installed the package in a directory and set up the config, you can call 
+Once you have installed the package in a directory and set up the config, you can call `parse` to parse text input from a command line.
 
-```sh
-npx node-mono-builder [args]
-```
-
-to use the tool.
-
-Commands start with one of:
+Parsing works as follows:
 - `help`: shows the help.
 - `list`: lists projects with their dependencies. Useful for learning about the dependencies.
 - `pushpull [projects]`: publishes a project to the registry, then pulls it into consuming projects. Also installs other packages.
 	- Optional flag: `install` to also `npm install` on each affected project.
 	- Optional flag: `dry-run` to list out the project names without actually affecting the projects.
-- `run [command] [projects]`: runs a command (such as build) on projects. (Note, you'll need to `pushpull` built projects before you can use them other places.)
+- `run [script] [projects]`: runs a script (such as build) on projects. (Note, you'll need to `pushpull` built projects before you can use them other places.)
 	- Optional flag: `pushpull` to also pushpull each affected project.
 	- Optional flag: `install` to also `npm install` on each affected project.
 	- Optional flag: `dry-run` to list out the project names without actually affecting the projects.
