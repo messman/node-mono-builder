@@ -6,7 +6,7 @@ import { beginExitError, endExitError, exitError } from './util/error';
 export function parse(args: string[], inputContext: CommandInputContext): void {
 
 	logLine();
-	const flagsAndPositionals = yargs.parse(args);
+	const flagsAndPositionals = yargs.parse(args) as { [key: string]: any; };
 
 	const positionals = flagsAndPositionals._ as (string[]);
 	const command = positionals.shift() as string | null | undefined;
