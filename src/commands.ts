@@ -98,6 +98,7 @@ export function runCommand(input: RunCommandInput, context: CommandInputContext)
 
 		selectedProjects.forEach((project) => {
 			updateStats(stats, project);
+			logInfo(`Project: ${project.name}`);
 
 			if (flags.pushpull) {
 				// Will not run 'npm update' on the first project.
