@@ -102,10 +102,7 @@ export function parse(args: string[], inputContext: CommandInputContext): void {
 	};
 
 	logCommand(runCommandInput);
-
-	if (!command && !runCommandInput) {
-		runCommand(runCommandInput, inputContext);
-	}
+	runCommand(runCommandInput, inputContext);
 }
 
 function logCommand(input: RunCommandInput): void {
