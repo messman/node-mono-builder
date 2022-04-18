@@ -1,0 +1,4 @@
+# By default, everything (doesn't cover package.json, README, CHANGLEOG, LICENSE)
+**/*
+
+!dist/**/*
