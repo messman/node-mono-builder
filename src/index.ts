@@ -1,2 +1,3 @@
-export { ExecuteInput, Builder, createBuilder } from './builder';
-export { Schema } from './schema';
+export { CommandInputContext, RunCommandInput, list, runCommand } from './commands';
+export { parse } from './parse';
+export type { Schema, ProjectSchema } from './schema';

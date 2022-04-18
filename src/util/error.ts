@@ -1,6 +1,6 @@
 import * as chalk from 'chalk';
 const line = '====================================';
-export function exitError(message: string): never {
+export function exitError(message: string | Error): never {
 	beginExitError();
 	console.error(message);
 	endExitError();

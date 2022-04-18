@@ -106,10 +106,12 @@ Commands start with one of:
 - `help`: shows the help.
 - `list`: lists projects with their dependencies. Useful for learning about the dependencies.
 - `pushpull [projects]`: publishes a project to the registry, then pulls it into consuming projects. Also installs other packages.
-	- Optional flag: `--dry-run` to list out the project names without actually affecting the projects.
+	- Optional flag: `install` to also `npm install` on each affected project.
+	- Optional flag: `dry-run` to list out the project names without actually affecting the projects.
 - `run [command] [projects]`: runs a command (such as build) on projects. (Note, you'll need to `pushpull` built projects before you can use them other places.)
 	- Optional flag: `pushpull` to also pushpull each affected project.
-	- Optional flag: `--dry-run` to list out the project names without actually affecting the projects.
+	- Optional flag: `install` to also `npm install` on each affected project.
+	- Optional flag: `dry-run` to list out the project names without actually affecting the projects.
 
 When referring to projects, you have options:
 - You can pass a single project name, like `proj-a`.

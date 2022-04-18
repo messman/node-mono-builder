@@ -1,6 +1,7 @@
 import { Schema } from './schema';
 import * as path from 'path';
-import { exitError } from './error';
+import { exitError } from './util/error';
+import { runtimeRequire } from './util/dynamic-require';
 
 export interface Graph {
 	isValid: (id: string) => boolean;
@@ -24,10 +25,8 @@ export interface ProjectContext {
 		/** Names of dev or regular package dependencies, including those we don't care about. */
 		allDependencies: Set<string>;
 	};
-	/** Command used to build the project, like 'npm run build' */
-	developmentBuildScript?: string;
-	/** Command used to build the project, like 'npm run build-production' */
-	productionBuildScript?: string;
+	/** A dictionary of commands used to build the project, like 'npm run build' */
+	scripts: { [command: string]: string; };
 	/** Dependencies. */
 	dependencies: Set<ProjectContext>;
 	/** Consumers. */
@@ -409,9 +408,9 @@ function parseGraph(schema: Schema, currentDirectory: string): Map<string, Proje
 		exitError('No projects defined');
 	}
 
-	/** '@messman/strudel-db-bind' -> 'db-bind' */
+	/** '@messman/ts-webpack-builder' -> 'tswb' */
 	const mapPackageNameToProjectName = new Map<string, string>();
-	/** 'db-bind' -> {project} */
+	/** 'tswb' -> {project} */
 	const mapProjectNameToProject = new Map<string, ProjectContext>();
 
 	Object.keys(schema.projects).forEach((projectName) => {
@@ -426,7 +425,7 @@ function parseGraph(schema: Schema, currentDirectory: string): Map<string, Proje
 		const packageJsonPath = path.resolve(absoluteProjectDirectory, './package.json');
 		let packageJson: any = null!;
 		try {
-			packageJson = require(packageJsonPath);
+			packageJson = runtimeRequire(packageJsonPath);
 		}
 		catch (e) {
 			console.error(e);
@@ -458,8 +457,7 @@ function parseGraph(schema: Schema, currentDirectory: string): Map<string, Proje
 				normalVersion: packageVersion,
 				allDependencies: allPackageDependencies
 			},
-			developmentBuildScript: project.developmentBuild,
-			productionBuildScript: project.productionBuild,
+			scripts: project.scripts || {},
 			absoluteLocation: path.resolve(buildRoot, project.path || ''),
 			dependencies: new Set(),
 			consumers: new Set()
