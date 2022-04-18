@@ -11,9 +11,6 @@
 		"monorepo",
 		"local"
 	],
-	"bin": {
-		"node-mono-builder": "cli/cli.js"
-	},
 	"scripts": {
 		"build": "ts-webpack-builder",
 		"build-production": "npm run clean && ts-webpack-builder --isDevelopment=false",

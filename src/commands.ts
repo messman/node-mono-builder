@@ -2,12 +2,13 @@ import { Schema } from './schema';
 import { checkIsValid, createGraph, ProjectContext } from './graph';
 import * as childProcess from 'child_process';
 import * as chalk from 'chalk';
-import { beginExitError, endExitError } from './util/error';
+import { beginExitError, endExitError, exitError } from './util/error';
 import { enumKeys } from './util/shared';
+import { logInfo } from './util/log';
 
 export interface RunCommandInput {
 	projects: string[];
-	command: string | null;
+	scriptName: string | null;
 	isExplicit: boolean;
 	includeProject: boolean;
 	includeAbove: boolean;
@@ -61,11 +62,14 @@ export function list(context: CommandInputContext): void {
 
 export function runCommand(input: RunCommandInput, context: CommandInputContext): void {
 	const graph = createGraph(context.schema, context.options.currentDirectory);
-	const { isExplicit, projects, flags, command } = input;
+	const { isExplicit, projects, flags, scriptName } = input;
 
 	let selectedProjects: Set<ProjectContext> = null!;
 	if (isExplicit) {
 		selectedProjects = graph.searchMultiple(projects);
+	}
+	else if (!projects.length) {
+		selectedProjects = new Set(graph.projects.values());
 	}
 	else {
 		const { includeProject, includeAbove, includeBelow } = input;
@@ -104,8 +108,8 @@ export function runCommand(input: RunCommandInput, context: CommandInputContext)
 				prePublish(flags.dryRun, project);
 			}
 
-			if (command) {
-				executeForProject(flags.dryRun, project, command);
+			if (scriptName) {
+				runScriptName(flags.dryRun, project, scriptName, context.schema);
 			}
 
 			if (flags.pushpull) {
@@ -224,6 +228,33 @@ function updateDependencies(isDryRun: boolean, project: ProjectContext, inSet: S
 	}
 }
 
+function runScriptName(isDryRun: boolean, project: ProjectContext, scriptName: string, schema: Schema): void {
+	let scriptText: string | null = null;
+	let source: string = null!;
+	const projectScriptText = project.scripts[scriptName] || null;
+	const schemaScriptText = (schema.scripts || {})[scriptName] || null;
+	const packageScriptText = project.package.scripts[scriptName] || null;
+
+	if (projectScriptText) {
+		scriptText = projectScriptText;
+		source = 'schema for project';
+	}
+	else if (schemaScriptText) {
+		scriptText = schemaScriptText;
+		source = 'schema';
+	}
+	else if (packageScriptText) {
+		scriptText = `npm run ${scriptName}`;
+		source = 'package.json';
+	}
+
+	if (!scriptText) {
+		exitError(`Script name '${scriptName}' not defined in schema or project package.json`);
+	}
+	logInfo(`Running script '${scriptName}' as defined in ${source}`);
+	executeForProject(isDryRun, project, scriptText);
+}
+
 function executeForProject(isDryRun: boolean, project: ProjectContext, text: string): void {
 	if (isDryRun) {
 		logInfo(`dry-run of '${text}'`);
@@ -248,8 +279,4 @@ interface ProcessingStats {
 function updateStats(processingStats: ProcessingStats, project: ProjectContext): void {
 	processingStats.currentProject = project;
 	processingStats.projectIndex++;
-}
-
-function logInfo(message: string): void {
-	console.log(chalk.cyan('>>>'), message);
 }

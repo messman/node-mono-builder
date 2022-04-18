@@ -24,6 +24,8 @@ export interface ProjectContext {
 		normalVersion: string;
 		/** Names of dev or regular package dependencies, including those we don't care about. */
 		allDependencies: Set<string>;
+		/** A dictionary of commands used to build the project, like 'npm run build' */
+		scripts: { [command: string]: string; };
 	};
 	/** A dictionary of commands used to build the project, like 'npm run build' */
 	scripts: { [command: string]: string; };
@@ -455,7 +457,8 @@ function parseGraph(schema: Schema, currentDirectory: string): Map<string, Proje
 			package: {
 				name: packageName,
 				normalVersion: packageVersion,
-				allDependencies: allPackageDependencies
+				allDependencies: allPackageDependencies,
+				scripts: packageJson['scripts'] || {}
 			},
 			scripts: project.scripts || {},
 			absoluteLocation: path.resolve(buildRoot, project.path || ''),

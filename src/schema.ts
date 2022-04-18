@@ -9,7 +9,7 @@ export interface Schema {
 	*/
 	pathRoot?: string;
 	/**
-	 * A dictionary of commands to run in each selected project. These commands
+	 * A dictionary of scripts to run in each selected project. These scripts
 	 * can be overridden at the project schema level or may point to `package.json`
 	 * scripts that can have different definitions.
 	 * 
@@ -18,7 +18,7 @@ export interface Schema {
 	 * 'build': 'npm run build'
 	 * ```
 	*/
-	scripts?: { [command: string]: string; };
+	scripts?: { [scriptName: string]: string; };
 	/**
 	 * Projects. The key is an alias or shorthand for the project name,
 	 * and is how it is referred in the commands.
@@ -34,5 +34,5 @@ export interface ProjectSchema {
 	/**
 	 * Overrides from the `run` property that are specific to this project.
 	 */
-	scripts?: { [command: string]: string; };
+	scripts?: { [scriptName: string]: string; };
 }
