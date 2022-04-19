@@ -100,13 +100,15 @@ export function runCommand(input: RunCommandInput, context: CommandInputContext)
 			updateStats(stats, project);
 			logInfo(`Project: ${project.name}`);
 
-			if (flags.pushpull) {
+			if (flags.pushpull || flags.install) {
 				// Will not run 'npm update' on the first project.
 				// This is more for updating dependencies of projects that were shipped earlier in the loop.
 				updateDependencies(flags.dryRun, project, selectedProjects, flags.install);
 
-				// Change version ahead of time so it is used in the build, if any.
-				prePublish(flags.dryRun, project);
+				if (flags.pushpull) {
+					// Change version ahead of time so it is used in the build, if any.
+					prePublish(flags.dryRun, project);
+				}
 			}
 
 			if (scriptName) {
@@ -195,7 +197,7 @@ function publish(isDryRun: boolean, project: ProjectContext): void {
 	executeForProject(isDryRun, project, `${publish} && ${backToVersion}`);
 }
 
-/** Runs 'npm update' o r'npm install' on dependencies of the passed project that are in the passed set.  */
+/** Runs 'npm update' or 'npm install' on dependencies of the passed project that are in the passed set.  */
 function updateDependencies(isDryRun: boolean, project: ProjectContext, inSet: Set<ProjectContext>, install: boolean): void {
 	/*
 		Missing dependencies (local or otherwise) are added here regardless, UNLESS "install" is not set AND the project has no local dependencies.
