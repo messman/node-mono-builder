@@ -200,23 +200,18 @@ function publish(isDryRun: boolean, project: ProjectContext): void {
 /** Runs 'npm update' or 'npm install' on dependencies of the passed project that are in the passed set.  */
 function updateDependencies(isDryRun: boolean, project: ProjectContext, inSet: Set<ProjectContext>, install: boolean): void {
 	/*
-		Missing dependencies (local or otherwise) are added here regardless, UNLESS "install" is not set AND the project has no local dependencies.
-	*/
-	if (install) {
-		/*
-			Run npm install in case this is new from git.
-		*/
-		logInfo(`Running 'npm install' in ${project.name}`);
-		executeForProject(isDryRun, project, `npm install --fund=false`);
-	}
-	else {
-		/*
-			https://docs.npmjs.com/cli/v7/commands/npm-update
-			Update only the dependencies that are a part of our build - no others.
+		Two scenarios:
+		1. the project has local dependencies - in this case, 'npm update'-ing those dependencies will automatically add any missing 
+			packages, local or otherwise; thus, we don't also need to run 'npm install'.
+		2. the project has no local dependencies (usually meaning it is consumed by many projects) - in this case, npm install may need to
+			run to add any missing dependencies.
 
-			However, any missing packages are also installed - so it works like `npm install` in that way.
-		*/
-		const dependenciesToUpdate = Array.from(project.dependencies.values())
+		So, if 'install' is false and the project has no local dependencies, missing dependencies will not be added; else, they will be added.
+		Documentation for npm update: https://docs.npmjs.com/cli/v7/commands/npm-update
+	*/
+
+	const dependenciesToUpdate =
+		Array.from(project.dependencies.values())
 			.filter((dependency) => {
 				return inSet.has(dependency);
 			})
@@ -224,10 +219,13 @@ function updateDependencies(isDryRun: boolean, project: ProjectContext, inSet: S
 				return dependency.package.name;
 			});
 
-		if (dependenciesToUpdate.length) {
-			logInfo(`Running 'npm update' in ${project.name} for ${dependenciesToUpdate.join(', ')}`);
-			executeForProject(isDryRun, project, `npm update ${dependenciesToUpdate.join(' ')} --fund=false --audit=false`);
-		}
+	if (dependenciesToUpdate.length) {
+		logInfo(`Running 'npm update' in ${project.name} for ${dependenciesToUpdate.join(', ')}`);
+		executeForProject(isDryRun, project, `npm update ${dependenciesToUpdate.join(' ')} --fund=false --audit=false`);
+	}
+	else if (install) {
+		logInfo(`Running 'npm install' in ${project.name}`);
+		executeForProject(isDryRun, project, `npm install --fund=false`);
 	}
 }
 
