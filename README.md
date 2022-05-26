@@ -129,6 +129,10 @@ list
 run build bridge-client bridge-iso --pushpull
 ```
 
+## Changelog
+
+1.1.0: Fix issue where passing "all" modifier would not look at dependency order and would start to process in definition order.
+
 ## Behind The Scenes
 
 To 'push' a package in this context of the build system means:
