@@ -1,6 +1,6 @@
 {
 	"name": "@messman/node-mono-builder",
-	"version": "1.0.5",
+	"version": "1.1.0",
 	"description": "A tool for managing local development of NodeJS monorepos.",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
