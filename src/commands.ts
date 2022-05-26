@@ -69,7 +69,7 @@ export function runCommand(input: RunCommandInput, context: CommandInputContext)
 		selectedProjects = graph.searchMultiple(projects);
 	}
 	else if (!projects.length) {
-		selectedProjects = new Set(graph.projects.values());
+		selectedProjects = graph.searchMultiple(Array.from(graph.projects.keys()));
 	}
 	else {
 		const { includeProject, includeAbove, includeBelow } = input;
